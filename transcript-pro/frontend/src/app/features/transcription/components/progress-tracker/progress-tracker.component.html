@@ -1,0 +1,11 @@
+<section *ngIf="job" class="progress-wrapper">
+  <header>
+    <strong>{{ job.filename }}</strong>
+    <span>{{ job.status }}</span>
+  </header>
+  <div class="track">
+    <div class="value" [style.width.%]="job.progress"></div>
+  </div>
+  <small>{{ job.progress | number: '1.0-2' }}% - {{ job.message }}</small>
+  <small *ngIf="job.error" class="error">{{ job.error }}</small>
+</section>

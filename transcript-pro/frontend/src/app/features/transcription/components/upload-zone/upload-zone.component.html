@@ -1,0 +1,12 @@
+<label
+  class="upload-zone"
+  (drop)="onDrop($event)"
+  (dragover)="onDragOver($event)"
+>
+  <input type="file" accept="audio/*,video/*" (change)="onFileInput($event)" />
+  <div class="content">
+    <h3>Drop audio/video here</h3>
+    <p>or click to pick a file</p>
+    <span>Supported: mp3, wav, m4a, mp4</span>
+  </div>
+</label>

@@ -1,0 +1,4 @@
+Grabación estándar 9.mp3
+__pycache__/
+*.pyc
+transcript-pro/backend/storage/uploads/

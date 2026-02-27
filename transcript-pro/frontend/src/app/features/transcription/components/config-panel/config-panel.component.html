@@ -1,0 +1,46 @@
+<form [formGroup]="form" class="config-grid">
+  <label>
+    <span>Language</span>
+    <input formControlName="lang" type="text" />
+  </label>
+
+  <label>
+    <span>Model</span>
+    <select formControlName="model">
+      <option value="tiny">tiny</option>
+      <option value="base">base</option>
+      <option value="small">small</option>
+      <option value="medium">medium</option>
+      <option value="large-v3">large-v3</option>
+    </select>
+  </label>
+
+  <label>
+    <span>Device</span>
+    <select formControlName="device">
+      <option value="cuda">cuda</option>
+      <option value="cpu">cpu</option>
+    </select>
+  </label>
+
+  <label>
+    <span>Compute</span>
+    <select formControlName="compute_type">
+      <option value="float16">float16</option>
+      <option value="int8_float16">int8_float16</option>
+      <option value="int8">int8</option>
+    </select>
+  </label>
+
+  <label>
+    <span>Beam size</span>
+    <input formControlName="beam_size" type="number" min="1" max="20" />
+  </label>
+
+  <label class="checkbox">
+    <input formControlName="generate_srt" type="checkbox" />
+    <span>Generate SRT</span>
+  </label>
+</form>
+
+<button type="button" (click)="startClicked.emit()" [disabled]="disabled">Start transcription</button>

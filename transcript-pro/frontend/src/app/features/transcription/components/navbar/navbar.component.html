@@ -1,0 +1,48 @@
+﻿<nav class="fixed top-0 w-full z-50 glass border-b border-gray-200 dark:border-gray-800">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between h-16 items-center">
+            <div class="flex items-center gap-3 cursor-pointer" routerLink="/home">
+                <div class="w-10 h-10 gradient-bg rounded-xl flex items-center justify-center text-white shadow-lg shadow-primary/30">
+                    <i class="fas fa-wave-square text-xl"></i>
+                </div>
+                <span class="text-xl font-bold gradient-text">TranscriptPro</span>
+            </div>
+
+            <div class="hidden md:flex items-center gap-6">
+                <button routerLink="/home" class="nav-link text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-primary font-medium transition-colors" data-view="home">
+                    <i class="fas fa-home mr-2"></i>Inicio
+                </button>
+                <button routerLink="/history" class="nav-link text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-primary font-medium transition-colors" data-view="history">
+                    <i class="fas fa-history mr-2"></i>Historial
+                </button>
+                <button routerLink="/settings" class="nav-link text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-primary font-medium transition-colors" data-view="settings">
+                    <i class="fas fa-cog mr-2"></i>Configuración
+                </button>
+            </div>
+
+            <div class="flex items-center gap-4">
+                <button (click)="theme.toggle()" class="p-2 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">
+                    <i class="fas fa-moon dark:hidden text-gray-600"></i>
+                    <i class="fas fa-sun hidden dark:block text-yellow-400"></i>
+                </button>
+
+                <div class="relative group">
+                    <button class="flex items-center gap-2 p-2 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">
+                        <img src="https://ui-avatars.com/api/?name=Usuario&background=8b5cf6&color=fff" class="w-8 h-8 rounded-full">
+                        <span class="hidden sm:block font-medium">Mi Cuenta</span>
+                        <i class="fas fa-chevron-down text-xs"></i>
+                    </button>
+
+                    <div class="absolute right-0 mt-2 w-48 glass-strong rounded-xl shadow-xl border border-gray-200 dark:border-gray-700 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 transform origin-top-right">
+                        <div class="py-2">
+                            <a href="#" class="block px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-800">Perfil</a>
+                            <a href="#" class="block px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-800">API Keys</a>
+                            <div class="border-t border-gray-200 dark:border-gray-700 my-1"></div>
+                            <a href="#" class="block px-4 py-2 text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20">Cerrar Sesión</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>

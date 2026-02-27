@@ -1,0 +1,27 @@
+.upload-zone {
+  display: block;
+  border: 2px dashed var(--color-primary);
+  border-radius: 16px;
+  padding: 2rem;
+  text-align: center;
+  background: var(--color-surface);
+  cursor: pointer;
+}
+
+.upload-zone input {
+  display: none;
+}
+
+.content h3 {
+  margin: 0 0 0.5rem;
+}
+
+.content p {
+  margin: 0 0 0.5rem;
+  color: var(--color-muted);
+}
+
+.content span {
+  font-size: 0.85rem;
+  color: var(--color-muted);
+}

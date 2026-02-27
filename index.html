@@ -1,0 +1,1231 @@
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TranscriptPro - Transcripción Profesional con IA</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#8b5cf6',
+                        secondary: '#06b6d4',
+                        accent: '#f59e0b',
+                        dark: '#0f172a',
+                        'dark-light': '#1e293b'
+                    },
+                    animation: {
+                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'bounce-slow': 'bounce 2s infinite',
+                        'spin-slow': 'spin 3s linear infinite',
+                        'wave': 'wave 2s ease-in-out infinite'
+                    },
+                    keyframes: {
+                        wave: {
+                            '0%, 100%': { transform: 'scaleY(1)' },
+                            '50%': { transform: 'scaleY(1.5)' }
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        
+        .glass {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        .dark .glass {
+            background: rgba(30, 41, 59, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .glass-strong {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+        
+        .dark .glass-strong {
+            background: rgba(15, 23, 42, 0.95);
+        }
+        
+        .gradient-text {
+            background: linear-gradient(135deg, #8b5cf6 0%, #06b6d4 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .gradient-bg {
+            background: linear-gradient(135deg, #8b5cf6 0%, #06b6d4 100%);
+        }
+        
+        .dropzone {
+            background-image: url("data:image/svg+xml,%3csvg width='100%25' height='100%25' xmlns='http://www.w3.org/2000/svg'%3e%3crect width='100%25' height='100%25' fill='none' rx='16' ry='16' stroke='%238B5CF6FF' stroke-width='2' stroke-dasharray='12%2c 12' stroke-dashoffset='0' stroke-linecap='square'/%3e%3c/svg%3e");
+            transition: all 0.3s ease;
+        }
+        
+        .dropzone.dragover {
+            background-color: rgba(139, 92, 246, 0.1);
+            transform: scale(1.02);
+        }
+        
+        .audio-wave {
+            display: flex;
+            align-items: center;
+            gap: 3px;
+            height: 40px;
+        }
+        
+        .audio-wave span {
+            width: 4px;
+            background: linear-gradient(to top, #8b5cf6, #06b6d4);
+            border-radius: 2px;
+            animation: wave 1.2s ease-in-out infinite;
+        }
+        
+        .audio-wave span:nth-child(2) { animation-delay: 0.1s; }
+        .audio-wave span:nth-child(3) { animation-delay: 0.2s; }
+        .audio-wave span:nth-child(4) { animation-delay: 0.3s; }
+        .audio-wave span:nth-child(5) { animation-delay: 0.4s; }
+        .audio-wave span:nth-child(6) { animation-delay: 0.5s; }
+        .audio-wave span:nth-child(7) { animation-delay: 0.6s; }
+        .audio-wave span:nth-child(8) { animation-delay: 0.7s; }
+        
+        .progress-bar {
+            transition: width 0.3s ease;
+        }
+        
+        .segment {
+            transition: all 0.2s ease;
+        }
+        
+        .segment:hover {
+            background-color: rgba(139, 92, 246, 0.1);
+            transform: translateX(4px);
+        }
+        
+        .segment.active {
+            background-color: rgba(139, 92, 246, 0.2);
+            border-left: 3px solid #8b5cf6;
+        }
+        
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        
+        .dark ::-webkit-scrollbar-thumb {
+            background: #475569;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+        
+        .tooltip {
+            visibility: hidden;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        
+        .has-tooltip:hover .tooltip {
+            visibility: visible;
+            opacity: 1;
+        }
+        
+        .view {
+            display: none;
+            animation: fadeIn 0.4s ease-in-out;
+        }
+        
+        .view.active {
+            display: block;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .checkbox-wrapper input:checked + div {
+            background-color: #8b5cf6;
+            border-color: #8b5cf6;
+        }
+        
+        .checkbox-wrapper input:checked + div svg {
+            display: block;
+        }
+        
+        .range-slider {
+            -webkit-appearance: none;
+            appearance: none;
+            background: transparent;
+            cursor: pointer;
+        }
+        
+        .range-slider::-webkit-slider-track {
+            background: #e2e8f0;
+            height: 6px;
+            border-radius: 3px;
+        }
+        
+        .dark .range-slider::-webkit-slider-track {
+            background: #334155;
+        }
+        
+        .range-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            background: #8b5cf6;
+            height: 18px;
+            width: 18px;
+            border-radius: 50%;
+            margin-top: -6px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            transition: transform 0.1s;
+        }
+        
+        .range-slider::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+        }
+    </style>
+</head>
+<body class="bg-gray-50 dark:bg-dark text-gray-900 dark:text-gray-100 transition-colors duration-300 min-h-screen">
+
+    <!-- Navigation -->
+    <nav class="fixed top-0 w-full z-50 glass border-b border-gray-200 dark:border-gray-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16 items-center">
+                <div class="flex items-center gap-3 cursor-pointer" onclick="router.navigate('home')">
+                    <div class="w-10 h-10 gradient-bg rounded-xl flex items-center justify-center text-white shadow-lg shadow-primary/30">
+                        <i class="fas fa-wave-square text-xl"></i>
+                    </div>
+                    <span class="text-xl font-bold gradient-text">TranscriptPro</span>
+                </div>
+                
+                <div class="hidden md:flex items-center gap-6">
+                    <button onclick="router.navigate('home')" class="nav-link text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-primary font-medium transition-colors" data-view="home">
+                        <i class="fas fa-home mr-2"></i>Inicio
+                    </button>
+                    <button onclick="router.navigate('history')" class="nav-link text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-primary font-medium transition-colors" data-view="history">
+                        <i class="fas fa-history mr-2"></i>Historial
+                    </button>
+                    <button onclick="router.navigate('settings')" class="nav-link text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-primary font-medium transition-colors" data-view="settings">
+                        <i class="fas fa-cog mr-2"></i>Configuración
+                    </button>
+                </div>
+
+                <div class="flex items-center gap-4">
+                    <button onclick="theme.toggle()" class="p-2 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">
+                        <i class="fas fa-moon dark:hidden text-gray-600"></i>
+                        <i class="fas fa-sun hidden dark:block text-yellow-400"></i>
+                    </button>
+                    
+                    <div class="relative group">
+                        <button class="flex items-center gap-2 p-2 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">
+                            <img src="https://ui-avatars.com/api/?name=Usuario&background=8b5cf6&color=fff" class="w-8 h-8 rounded-full">
+                            <span class="hidden sm:block font-medium">Mi Cuenta</span>
+                            <i class="fas fa-chevron-down text-xs"></i>
+                        </button>
+                        
+                        <div class="absolute right-0 mt-2 w-48 glass-strong rounded-xl shadow-xl border border-gray-200 dark:border-gray-700 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 transform origin-top-right">
+                            <div class="py-2">
+                                <a href="#" class="block px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-800">Perfil</a>
+                                <a href="#" class="block px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-800">API Keys</a>
+                                <div class="border-t border-gray-200 dark:border-gray-700 my-1"></div>
+                                <a href="#" class="block px-4 py-2 text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20">Cerrar Sesión</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="pt-20 pb-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+        
+        <!-- VIEW: HOME / UPLOAD -->
+        <div id="view-home" class="view active">
+            <!-- Hero Section -->
+            <div class="text-center mb-12">
+                <h1 class="text-4xl md:text-6xl font-bold mb-4 leading-tight">
+                    Transcripción <span class="gradient-text">Profesional</span><br>
+                    <span class="text-2xl md:text-4xl font-light text-gray-600 dark:text-gray-400">potenciada por IA</span>
+                </h1>
+                <p class="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
+                    Convierte tus reuniones, podcasts y entrevistas en texto preciso con reconocimiento de voz de última generación.
+                </p>
+            </div>
+
+            <div class="grid lg:grid-cols-3 gap-8">
+                <!-- Upload Zone -->
+                <div class="lg:col-span-2 space-y-6">
+                    <!-- Dropzone -->
+                    <div id="dropzone" class="dropzone rounded-2xl p-8 md:p-12 text-center cursor-pointer bg-white dark:bg-dark-light relative overflow-hidden group">
+                        <input type="file" id="fileInput" class="hidden" accept="audio/*,video/*">
+                        
+                        <div class="relative z-10">
+                            <div class="w-20 h-20 mx-auto mb-6 rounded-full bg-primary/10 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                                <i class="fas fa-cloud-upload-alt text-4xl text-primary"></i>
+                            </div>
+                            
+                            <h3 class="text-2xl font-semibold mb-2">Arrastra tu archivo aquí</h3>
+                            <p class="text-gray-500 dark:text-gray-400 mb-4">o haz clic para seleccionar</p>
+                            
+                            <div class="flex justify-center gap-4 text-sm text-gray-400">
+                                <span class="flex items-center gap-1"><i class="fas fa-music"></i> MP3</span>
+                                <span class="flex items-center gap-1"><i class="fas fa-file-audio"></i> WAV</span>
+                                <span class="flex items-center gap-1"><i class="fas fa-mobile-alt"></i> M4A</span>
+                                <span class="flex items-center gap-1"><i class="fas fa-video"></i> MP4</span>
+                            </div>
+                            
+                            <p class="text-xs text-gray-400 mt-4">Tamaño máximo: 500MB</p>
+                        </div>
+                        
+                        <!-- Background decoration -->
+                        <div class="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none">
+                            <div class="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-primary/5 to-secondary/5"></div>
+                        </div>
+                    </div>
+
+                    <!-- File Preview (hidden by default) -->
+                    <div id="filePreview" class="hidden glass rounded-2xl p-6 border border-gray-200 dark:border-gray-700">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-4">
+                                <div class="w-14 h-14 rounded-xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-white">
+                                    <i class="fas fa-file-audio text-2xl"></i>
+                                </div>
+                                <div>
+                                    <h4 id="fileName" class="font-semibold text-lg">archivo.mp3</h4>
+                                    <p id="fileSize" class="text-sm text-gray-500">12.5 MB • 45:30 minutos</p>
+                                </div>
+                            </div>
+                            <button onclick="upload.clear()" class="p-2 hover:bg-red-100 dark:hover:bg-red-900/30 text-red-500 rounded-lg transition-colors">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                        
+                        <!-- Audio Preview -->
+                        <div class="mt-4 p-4 bg-gray-100 dark:bg-gray-800 rounded-xl">
+                            <audio id="audioPreview" controls class="w-full"></audio>
+                        </div>
+                    </div>
+
+                    <!-- Progress Section (hidden by default) -->
+                    <div id="progressSection" class="hidden glass rounded-2xl p-8 border border-gray-200 dark:border-gray-700">
+                        <div class="flex items-center justify-between mb-4">
+                            <div>
+                                <h3 class="text-xl font-semibold mb-1">Transcribiendo...</h3>
+                                <p id="progressStatus" class="text-sm text-gray-500">Inicializando modelo Whisper...</p>
+                            </div>
+                            <div class="audio-wave">
+                                <span style="height: 20%"></span>
+                                <span style="height: 40%"></span>
+                                <span style="height: 60%"></span>
+                                <span style="height: 80%"></span>
+                                <span style="height: 100%"></span>
+                                <span style="height: 80%"></span>
+                                <span style="height: 60%"></span>
+                                <span style="height: 40%"></span>
+                            </div>
+                        </div>
+                        
+                        <div class="relative h-3 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+                            <div id="progressBar" class="absolute top-0 left-0 h-full gradient-bg progress-bar rounded-full" style="width: 0%"></div>
+                        </div>
+                        
+                        <div class="flex justify-between mt-2 text-sm text-gray-500">
+                            <span id="progressTime">0:00 / 45:30</span>
+                            <span id="progressPercent">0%</span>
+                        </div>
+                        
+                        <div id="progressDetails" class="mt-4 p-4 bg-gray-50 dark:bg-gray-800/50 rounded-lg font-mono text-xs text-gray-600 dark:text-gray-400 space-y-1">
+                            <div class="flex items-center gap-2">
+                                <i class="fas fa-check-circle text-green-500"></i>
+                                <span>Cargando modelo: medium (CUDA)</span>
+                            </div>
+                            <div id="detailVAD" class="flex items-center gap-2 opacity-50">
+                                <i class="fas fa-circle-notch fa-spin"></i>
+                                <span>Aplicando VAD...</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Results Section (hidden by default) -->
+                    <div id="resultsSection" class="hidden space-y-4">
+                        <div class="flex items-center justify-between">
+                            <h3 class="text-2xl font-bold">Resultado</h3>
+                            <div class="flex gap-2">
+                                <button onclick="results.copy()" class="px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors flex items-center gap-2">
+                                    <i class="fas fa-copy"></i>
+                                    <span class="hidden sm:inline">Copiar</span>
+                                </button>
+                                <button onclick="results.download('txt')" class="px-4 py-2 rounded-lg bg-gray-800 dark:bg-gray-700 text-white hover:bg-gray-700 dark:hover:bg-gray-600 transition-colors flex items-center gap-2">
+                                    <i class="fas fa-file-alt"></i>
+                                    <span class="hidden sm:inline">TXT</span>
+                                </button>
+                                <button onclick="results.download('srt')" class="px-4 py-2 rounded-lg gradient-bg text-white hover:opacity-90 transition-opacity flex items-center gap-2 shadow-lg shadow-primary/30">
+                                    <i class="fas fa-closed-captioning"></i>
+                                    <span class="hidden sm:inline">SRT</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Transcription Editor -->
+                        <div class="glass rounded-2xl border border-gray-200 dark:border-gray-700 overflow-hidden">
+                            <div class="bg-gray-50 dark:bg-gray-800/50 px-4 py-3 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
+                                <div class="flex items-center gap-4">
+                                    <button id="playPauseBtn" onclick="player.toggle()" class="w-10 h-10 rounded-full gradient-bg text-white flex items-center justify-center hover:opacity-90 transition-opacity">
+                                        <i class="fas fa-play"></i>
+                                    </button>
+                                    <div class="hidden sm:block">
+                                        <div class="text-sm font-medium" id="currentTime">00:00</div>
+                                        <div class="text-xs text-gray-500">Duración total</div>
+                                    </div>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <button onclick="results.toggleTimestamps()" class="p-2 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors has-tooltip relative">
+                                        <i class="fas fa-clock"></i>
+                                        <span class="tooltip absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-gray-800 text-white text-xs rounded whitespace-nowrap">Mostrar/ocultar timestamps</span>
+                                    </button>
+                                    <button class="p-2 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors has-tooltip relative">
+                                        <i class="fas fa-search"></i>
+                                        <span class="tooltip absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-gray-800 text-white text-xs rounded whitespace-nowrap">Buscar en texto</span>
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <div id="transcriptionContent" class="max-h-96 overflow-y-auto p-6 space-y-3">
+                                <!-- Segments will be inserted here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Configuration Panel -->
+                <div class="lg:col-span-1">
+                    <div class="glass rounded-2xl p-6 border border-gray-200 dark:border-gray-700 sticky top-24">
+                        <div class="flex items-center gap-2 mb-6">
+                            <i class="fas fa-sliders-h text-primary"></i>
+                            <h3 class="text-lg font-bold">Configuración</h3>
+                        </div>
+
+                        <div class="space-y-5">
+                            <!-- Language -->
+                            <div>
+                                <label class="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
+                                    Idioma
+                                    <span class="has-tooltip inline-block ml-1 text-gray-400 cursor-help">
+                                        <i class="fas fa-info-circle"></i>
+                                        <span class="tooltip absolute z-50 w-64 p-3 bg-gray-800 text-white text-xs rounded-lg shadow-xl -mt-2 ml-2">
+                                            Selecciona el idioma principal del audio. 'Auto-detectar' intentará identificarlo automáticamente.
+                                        </span>
+                                    </span>
+                                </label>
+                                <select id="configLang" class="w-full px-4 py-2 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all">
+                                    <option value="es">🇪🇸 Español</option>
+                                    <option value="en">🇺🇸 English</option>
+                                    <option value="auto">🌍 Auto-detectar</option>
+                                    <option value="fr">🇫🇷 Français</option>
+                                    <option value="de">🇩🇪 Deutsch</option>
+                                </select>
+                            </div>
+
+                            <!-- Model -->
+                            <div>
+                                <label class="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
+                                    Modelo Whisper
+                                    <span class="has-tooltip inline-block ml-1 text-gray-400 cursor-help">
+                                        <i class="fas fa-info-circle"></i>
+                                        <span class="tooltip absolute z-50 w-64 p-3 bg-gray-800 text-white text-xs rounded-lg shadow-xl -mt-2 ml-2">
+                                            Modelos más grandes = mayor precisión pero más lento. 'Medium' es el equilibrio recomendado.
+                                        </span>
+                                    </span>
+                                </label>
+                                <select id="configModel" class="w-full px-4 py-2 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all">
+                                    <option value="tiny">Tiny (rápido, baja precisión)</option>
+                                    <option value="base">Base</option>
+                                    <option value="small">Small</option>
+                                    <option value="medium" selected>Medium (recomendado)</option>
+                                    <option value="large-v3">Large v3 (máxima precisión)</option>
+                                </select>
+                            </div>
+
+                            <!-- Device -->
+                            <div>
+                                <label class="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Dispositivo</label>
+                                <div class="grid grid-cols-2 gap-2">
+                                    <label class="cursor-pointer">
+                                        <input type="radio" name="device" value="cuda" class="hidden peer" checked>
+                                        <div class="px-4 py-2 rounded-xl border-2 border-gray-300 dark:border-gray-600 peer-checked:border-primary peer-checked:bg-primary/10 text-center transition-all">
+                                            <i class="fas fa-microchip mb-1 block"></i>
+                                            <span class="text-sm font-medium">CUDA (GPU)</span>
+                                        </div>
+                                    </label>
+                                    <label class="cursor-pointer">
+                                        <input type="radio" name="device" value="cpu" class="hidden peer">
+                                        <div class="px-4 py-2 rounded-xl border-2 border-gray-300 dark:border-gray-600 peer-checked:border-primary peer-checked:bg-primary/10 text-center transition-all">
+                                            <i class="fas fa-server mb-1 block"></i>
+                                            <span class="text-sm font-medium">CPU</span>
+                                        </div>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <!-- Compute Type -->
+                            <div>
+                                <label class="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Tipo de Cómputo</label>
+                                <select id="configCompute" class="w-full px-4 py-2 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all">
+                                    <option value="float16">Float16 (preciso)</option>
+                                    <option value="int8_float16">Int8 Float16 (rápido)</option>
+                                    <option value="int8">Int8 (ligero)</option>
+                                </select>
+                            </div>
+
+                            <!-- Beam Size -->
+                            <div>
+                                <div class="flex justify-between mb-2">
+                                    <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Beam Size</label>
+                                    <span id="beamValue" class="text-sm font-bold text-primary">5</span>
+                                </div>
+                                <input type="range" id="configBeam" min="1" max="10" value="5" class="range-slider w-full" oninput="document.getElementById('beamValue').textContent = this.value">
+                                <div class="flex justify-between text-xs text-gray-500 mt-1">
+                                    <span>Rápido</span>
+                                    <span>Preciso</span>
+                                </div>
+                            </div>
+
+                            <!-- Options -->
+                            <div class="space-y-3 pt-4 border-t border-gray-200 dark:border-gray-700">
+                                <label class="checkbox-wrapper flex items-center gap-3 cursor-pointer group">
+                                    <input type="checkbox" id="configSRT" class="hidden" checked>
+                                    <div class="w-5 h-5 border-2 border-gray-300 dark:border-gray-600 rounded flex items-center justify-center transition-colors">
+                                        <svg class="w-3 h-3 text-white hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
+                                    </div>
+                                    <span class="text-sm text-gray-700 dark:text-gray-300 group-hover:text-primary transition-colors">Generar archivo SRT</span>
+                                </label>
+                                
+                                <label class="checkbox-wrapper flex items-center gap-3 cursor-pointer group">
+                                    <input type="checkbox" id="configDiarization" class="hidden">
+                                    <div class="w-5 h-5 border-2 border-gray-300 dark:border-gray-600 rounded flex items-center justify-center transition-colors">
+                                        <svg class="w-3 h-3 text-white hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
+                                    </div>
+                                    <span class="text-sm text-gray-700 dark:text-gray-300 group-hover:text-primary transition-colors">
+                                        Identificación de hablantes
+                                        <span class="ml-1 text-xs text-accent">PRO</span>
+                                    </span>
+                                </label>
+
+                                <label class="checkbox-wrapper flex items-center gap-3 cursor-pointer group">
+                                    <input type="checkbox" id="configPunctuation" class="hidden" checked>
+                                    <div class="w-5 h-5 border-2 border-gray-300 dark:border-gray-600 rounded flex items-center justify-center transition-colors">
+                                        <svg class="w-3 h-3 text-white hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
+                                    </div>
+                                    <span class="text-sm text-gray-700 dark:text-gray-300 group-hover:text-primary transition-colors">Mejorar puntuación</span>
+                                </label>
+                            </div>
+
+                            <!-- Action Button -->
+                            <button id="startBtn" onclick="upload.start()" disabled class="w-full py-3 rounded-xl gradient-bg text-white font-semibold shadow-lg shadow-primary/30 disabled:opacity-50 disabled:cursor-not-allowed hover:opacity-90 transition-all transform active:scale-95 flex items-center justify-center gap-2">
+                                <i class="fas fa-magic"></i>
+                                <span>Iniciar Transcripción</span>
+                            </button>
+                            
+                            <p class="text-xs text-center text-gray-500">
+                                Tiempo estimado: <span id="timeEstimate">~3 minutos</span>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- VIEW: HISTORY -->
+        <div id="view-history" class="view">
+            <div class="mb-8">
+                <h2 class="text-3xl font-bold mb-2">Historial de Transcripciones</h2>
+                <p class="text-gray-600 dark:text-gray-400">Gestiona tus archivos transcritos anteriormente</p>
+            </div>
+
+            <div class="glass rounded-2xl border border-gray-200 dark:border-gray-700 overflow-hidden">
+                <div class="p-4 border-b border-gray-200 dark:border-gray-700 flex flex-col sm:flex-row gap-4 justify-between items-center">
+                    <div class="relative flex-1 max-w-md w-full">
+                        <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                        <input type="text" placeholder="Buscar transcripciones..." class="w-full pl-10 pr-4 py-2 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 focus:ring-2 focus:ring-primary focus:border-transparent outline-none">
+                    </div>
+                    <div class="flex gap-2">
+                        <select class="px-4 py-2 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm">
+                            <option>Todos los idiomas</option>
+                            <option>Español</option>
+                            <option>English</option>
+                        </select>
+                        <select class="px-4 py-2 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm">
+                            <option>Más recientes</option>
+                            <option>Más antiguos</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="divide-y divide-gray-200 dark:divide-gray-700" id="historyList">
+                    <!-- History items will be populated by JS -->
+                </div>
+            </div>
+        </div>
+
+        <!-- VIEW: SETTINGS -->
+        <div id="view-settings" class="view">
+            <div class="max-w-3xl mx-auto">
+                <h2 class="text-3xl font-bold mb-8">Configuración Global</h2>
+                
+                <div class="space-y-6">
+                    <!-- API Configuration -->
+                    <div class="glass rounded-2xl p-6 border border-gray-200 dark:border-gray-700">
+                        <h3 class="text-lg font-semibold mb-4 flex items-center gap-2">
+                            <i class="fas fa-key text-primary"></i>
+                            API y Credenciales
+                        </h3>
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium mb-2">API Key</label>
+                                <div class="flex gap-2">
+                                    <input type="password" value="sk-••••••••••••••••" class="flex-1 px-4 py-2 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800" readonly>
+                                    <button class="px-4 py-2 rounded-xl border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                    <button class="px-4 py-2 rounded-xl border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+                                        <i class="fas fa-copy"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <button class="text-primary hover:underline text-sm">Regenerar API Key</button>
+                        </div>
+                    </div>
+
+                    <!-- Default Settings -->
+                    <div class="glass rounded-2xl p-6 border border-gray-200 dark:border-gray-700">
+                        <h3 class="text-lg font-semibold mb-4 flex items-center gap-2">
+                            <i class="fas fa-cog text-secondary"></i>
+                            Preferencias por Defecto
+                        </h3>
+                        <div class="grid md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium mb-2">Modelo por defecto</label>
+                                <select class="w-full px-4 py-2 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800">
+                                    <option>Medium</option>
+                                    <option>Large v3</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium mb-2">Idioma por defecto</label>
+                                <select class="w-full px-4 py-2 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800">
+                                    <option>Español</option>
+                                    <option>English</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Notifications -->
+                    <div class="glass rounded-2xl p-6 border border-gray-200 dark:border-gray-700">
+                        <h3 class="text-lg font-semibold mb-4 flex items-center gap-2">
+                            <i class="fas fa-bell text-accent"></i>
+                            Notificaciones
+                        </h3>
+                        <div class="space-y-3">
+                            <label class="checkbox-wrapper flex items-center gap-3 cursor-pointer">
+                                <input type="checkbox" checked class="hidden">
+                                <div class="w-5 h-5 border-2 border-gray-300 dark:border-gray-600 rounded flex items-center justify-center transition-colors bg-primary border-primary">
+                                    <svg class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
+                                </div>
+                                <span class="text-gray-700 dark:text-gray-300">Notificar cuando termine la transcripción</span>
+                            </label>
+                            <label class="checkbox-wrapper flex items-center gap-3 cursor-pointer">
+                                <input type="checkbox" class="hidden">
+                                <div class="w-5 h-5 border-2 border-gray-300 dark:border-gray-600 rounded flex items-center justify-center transition-colors">
+                                    <svg class="w-3 h-3 text-white hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
+                                </div>
+                                <span class="text-gray-700 dark:text-gray-300">Resumen semanal de uso</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed bottom-4 right-4 transform translate-y-20 opacity-0 transition-all duration-300 z-50">
+        <div class="glass-strong px-6 py-4 rounded-xl shadow-2xl border border-gray-200 dark:border-gray-700 flex items-center gap-3">
+            <i id="toastIcon" class="fas fa-check-circle text-green-500 text-xl"></i>
+            <span id="toastMessage" class="font-medium">Operación exitosa</span>
+        </div>
+    </div>
+
+    <script>
+        // Theme Management
+        const theme = {
+            init() {
+                if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                    document.documentElement.classList.add('dark');
+                } else {
+                    document.documentElement.classList.remove('dark');
+                }
+            },
+            toggle() {
+                if (document.documentElement.classList.contains('dark')) {
+                    document.documentElement.classList.remove('dark');
+                    localStorage.theme = 'light';
+                } else {
+                    document.documentElement.classList.add('dark');
+                    localStorage.theme = 'dark';
+                }
+            }
+        };
+
+        // Router
+        const router = {
+            currentView: 'home',
+            navigate(view) {
+                // Hide all views
+                document.querySelectorAll('.view').forEach(v => {
+                    v.classList.remove('active');
+                });
+                
+                // Show target view
+                document.getElementById(`view-${view}`).classList.add('active');
+                
+                // Update nav links
+                document.querySelectorAll('.nav-link').forEach(link => {
+                    if (link.dataset.view === view) {
+                        link.classList.add('text-primary');
+                        link.classList.remove('text-gray-600', 'dark:text-gray-300');
+                    } else {
+                        link.classList.remove('text-primary');
+                        link.classList.add('text-gray-600', 'dark:text-gray-300');
+                    }
+                });
+                
+                this.currentView = view;
+                
+                // Update page title
+                const titles = {
+                    'home': 'Inicio',
+                    'history': 'Historial',
+                    'settings': 'Configuración'
+                };
+                document.title = `TranscriptPro - ${titles[view]}`;
+                
+                // Load view data if needed
+                if (view === 'history') {
+                    history.load();
+                }
+            }
+        };
+
+        // Upload & File Handling
+        const upload = {
+            file: null,
+            isProcessing: false,
+            
+            init() {
+                const dropzone = document.getElementById('dropzone');
+                const fileInput = document.getElementById('fileInput');
+                
+                // Drag & Drop events
+                dropzone.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    dropzone.classList.add('dragover');
+                });
+                
+                dropzone.addEventListener('dragleave', () => {
+                    dropzone.classList.remove('dragover');
+                });
+                
+                dropzone.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    dropzone.classList.remove('dragover');
+                    const files = e.dataTransfer.files;
+                    if (files.length) this.handleFile(files[0]);
+                });
+                
+                dropzone.addEventListener('click', () => {
+                    fileInput.click();
+                });
+                
+                fileInput.addEventListener('change', (e) => {
+                    if (e.target.files.length) this.handleFile(e.target.files[0]);
+                });
+            },
+            
+            handleFile(file) {
+                const validTypes = ['audio/mpeg', 'audio/wav', 'audio/x-m4a', 'audio/mp4', 'video/mp4'];
+                const validExtensions = ['.mp3', '.wav', '.m4a', '.mp4'];
+                const extension = '.' + file.name.split('.').pop().toLowerCase();
+                
+                if (!validExtensions.includes(extension)) {
+                    toast.show('Formato no soportado. Usa MP3, WAV, M4A o MP4.', 'error');
+                    return;
+                }
+                
+                this.file = file;
+                
+                // Show preview
+                document.getElementById('fileName').textContent = file.name;
+                document.getElementById('fileSize').textContent = this.formatFileSize(file.size);
+                document.getElementById('dropzone').classList.add('hidden');
+                document.getElementById('filePreview').classList.remove('hidden');
+                
+                // Enable start button
+                document.getElementById('startBtn').disabled = false;
+                
+                // Create audio preview URL
+                const url = URL.createObjectURL(file);
+                document.getElementById('audioPreview').src = url;
+                
+                // Estimate time (rough calculation: 1 min audio = 3-10 sec processing depending on model)
+                const audio = new Audio(url);
+                audio.onloadedmetadata = () => {
+                    const duration = audio.duration;
+                    const model = document.getElementById('configModel').value;
+                    const multipliers = { 'tiny': 0.5, 'base': 0.8, 'small': 1.2, 'medium': 2, 'large-v3': 4 };
+                    const estimatedSeconds = (duration * (multipliers[model] || 2)) / 60;
+                    const mins = Math.ceil(estimatedSeconds);
+                    document.getElementById('timeEstimate').textContent = `~${mins} minuto${mins !== 1 ? 's' : ''}`;
+                };
+                
+                toast.show('Archivo cargado correctamente');
+            },
+            
+            clear() {
+                this.file = null;
+                document.getElementById('fileInput').value = '';
+                document.getElementById('dropzone').classList.remove('hidden');
+                document.getElementById('filePreview').classList.add('hidden');
+                document.getElementById('startBtn').disabled = true;
+                document.getElementById('resultsSection').classList.add('hidden');
+                document.getElementById('progressSection').classList.add('hidden');
+            },
+            
+            async start() {
+                if (!this.file || this.isProcessing) return;
+                
+                this.isProcessing = true;
+                document.getElementById('filePreview').classList.add('hidden');
+                document.getElementById('progressSection').classList.remove('hidden');
+                document.getElementById('startBtn').disabled = true;
+                document.getElementById('startBtn').innerHTML = '<i class="fas fa-circle-notch fa-spin"></i><span>Procesando...</span>';
+                
+                // Simulate progress
+                const progressBar = document.getElementById('progressBar');
+                const progressPercent = document.getElementById('progressPercent');
+                const progressStatus = document.getElementById('progressStatus');
+                const progressTime = document.getElementById('progressTime');
+                const detailVAD = document.getElementById('detailVAD');
+                
+                const stages = [
+                    { pct: 10, status: 'Cargando modelo Whisper...', time: '0:05 / 45:30' },
+                    { pct: 25, status: 'Aplicando VAD (Voice Activity Detection)...', time: '11:20 / 45:30', vad: true },
+                    { pct: 40, status: 'Transcribiendo segmentos...', time: '18:10 / 45:30' },
+                    { pct: 60, status: 'Transcribiendo segmentos...', time: '27:15 / 45:30' },
+                    { pct: 80, status: 'Transcribiendo segmentos...', time: '36:30 / 45:30' },
+                    { pct: 95, status: 'Post-procesamiento...', time: '43:10 / 45:30' },
+                    { pct: 100, status: '¡Transcripción completada!', time: '45:30 / 45:30' }
+                ];
+                
+                for (let stage of stages) {
+                    await this.delay(800 + Math.random() * 1000);
+                    progressBar.style.width = stage.pct + '%';
+                    progressPercent.textContent = stage.pct + '%';
+                    progressStatus.textContent = stage.status;
+                    progressTime.textContent = stage.time;
+                    
+                    if (stage.vad) {
+                        detailVAD.classList.remove('opacity-50');
+                        detailVAD.innerHTML = '<i class="fas fa-check-circle text-green-500"></i><span>VAD aplicado</span>';
+                    }
+                }
+                
+                await this.delay(500);
+                
+                // Show results
+                document.getElementById('progressSection').classList.add('hidden');
+                document.getElementById('resultsSection').classList.remove('hidden');
+                
+                // Generate mock transcription
+                results.generate();
+                
+                // Reset button
+                this.isProcessing = false;
+                document.getElementById('startBtn').innerHTML = '<i class="fas fa-magic"></i><span>Iniciar Transcripción</span>';
+                
+                // Add to history
+                history.add({
+                    name: this.file.name,
+                    date: new Date(),
+                    duration: '45:30',
+                    model: document.getElementById('configModel').value
+                });
+                
+                toast.show('¡Transcripción completada!');
+            },
+            
+            formatFileSize(bytes) {
+                if (bytes === 0) return '0 Bytes';
+                const k = 1024;
+                const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+                const i = Math.floor(Math.log(bytes) / Math.log(k));
+                return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+            },
+            
+            delay(ms) {
+                return new Promise(resolve => setTimeout(resolve, ms));
+            }
+        };
+
+        // Results & Player
+        const results = {
+            segments: [],
+            showTimestamps: true,
+            isPlaying: false,
+            
+            generate() {
+                // Generate realistic mock transcription segments
+                const texts = [
+                    "Bienvenidos a la reunión de hoy. Vamos a revisar los avances del proyecto.",
+                    "El primer punto es el análisis de ventas del último trimestre.",
+                    "Como pueden ver en la gráfica, hemos tenido un crecimiento del 15%.",
+                    "Esto supera nuestras expectativas iniciales que eran del 10%.",
+                    "¿Alguna pregunta sobre estos números antes de continuar?",
+                    "Perfecto, entonces pasemos al siguiente tema que es la planificación.",
+                    "Necesitamos definir los objetivos para el próximo semestre.",
+                    "Propongo que nos enfoquemos en tres áreas principales.",
+                    "Primero, la expansión al mercado internacional.",
+                    "Segundo, la mejora de la plataforma tecnológica.",
+                    "Y tercero, el programa de capacitación para el equipo.",
+                    "¿Están todos de acuerdo con estas prioridades?",
+                    "Excelente, entonces asignemos responsabilidades.",
+                    "María, ¿podrías liderar el tema de expansión internacional?",
+                    "Con gusto, ya tengo algunos contactos en Europa.",
+                    "Perfecto, y Carlos, ¿te encargas de la plataforma?",
+                    "Sí, ya tengo el equipo de desarrollo listo.",
+                    "Genial, entonces quedamos así. Próxima reunión la semana que viene.",
+                    "Muchas gracias a todos por su tiempo.",
+                    "Que tengan buen día."
+                ];
+                
+                let currentTime = 15;
+                this.segments = texts.map((text, i) => {
+                    const duration = 15 + Math.floor(Math.random() * 20);
+                    const start = currentTime;
+                    const end = currentTime + duration;
+                    currentTime = end + 2;
+                    
+                    return {
+                        id: i + 1,
+                        start: this.formatTime(start),
+                        end: this.formatTime(end),
+                        text: text,
+                        speaker: i % 3 === 0 ? 'María' : (i % 3 === 1 ? 'Carlos' : 'Ana')
+                    };
+                });
+                
+                this.render();
+            },
+            
+            render() {
+                const container = document.getElementById('transcriptionContent');
+                container.innerHTML = '';
+                
+                this.segments.forEach((seg, idx) => {
+                    const div = document.createElement('div');
+                    div.className = 'segment p-3 rounded-lg cursor-pointer';
+                    div.dataset.index = idx;
+                    div.onclick = () => this.seekTo(idx);
+                    
+                    const timestamp = this.showTimestamps ? 
+                        `<span class="text-xs font-mono text-primary mr-3 select-none">${seg.start}</span>` : '';
+                    
+                    const speaker = document.getElementById('configDiarization').checked ?
+                        `<span class="text-xs font-semibold text-secondary mr-2">[${seg.speaker}]</span>` : '';
+                    
+                    div.innerHTML = `
+                        <div class="flex items-start">
+                            ${timestamp}
+                            <div class="flex-1">
+                                ${speaker}
+                                <span class="text-gray-800 dark:text-gray-200">${seg.text}</span>
+                            </div>
+                        </div>
+                    `;
+                    
+                    container.appendChild(div);
+                });
+            },
+            
+            toggleTimestamps() {
+                this.showTimestamps = !this.showTimestamps;
+                this.render();
+            },
+            
+            seekTo(index) {
+                // Remove active class from all
+                document.querySelectorAll('.segment').forEach(s => s.classList.remove('active'));
+                // Add to current
+                const seg = document.querySelector(`[data-index="${index}"]`);
+                if (seg) {
+                    seg.classList.add('active');
+                    seg.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+            },
+            
+            copy() {
+                const text = this.segments.map(s => s.text).join(' ');
+                navigator.clipboard.writeText(text).then(() => {
+                    toast.show('Texto copiado al portapapeles');
+                });
+            },
+            
+            download(format) {
+                let content, filename, mime;
+                
+                if (format === 'txt') {
+                    content = this.segments.map(s => s.text).join('\n\n');
+                    filename = 'transcripcion.txt';
+                    mime = 'text/plain';
+                } else {
+                    // SRT format
+                    content = this.segments.map((s, i) => {
+                        const start = s.start.replace('.', ',');
+                        const end = s.end.replace('.', ',');
+                        return `${i + 1}\n${start} --> ${end}\n${s.text}\n`;
+                    }).join('\n');
+                    filename = 'transcripcion.srt';
+                    mime = 'text/plain';
+                }
+                
+                const blob = new Blob([content], { type: mime });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = filename;
+                a.click();
+                URL.revokeObjectURL(url);
+                
+                toast.show(`Descargando ${format.toUpperCase()}...`);
+            },
+            
+            formatTime(seconds) {
+                const hrs = Math.floor(seconds / 3600);
+                const mins = Math.floor((seconds % 3600) / 60);
+                const secs = Math.floor(seconds % 60);
+                const ms = Math.floor((seconds % 1) * 1000);
+                
+                if (hrs > 0) {
+                    return `${hrs}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+                }
+                return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+            }
+        };
+
+        // Audio Player
+        const player = {
+            toggle() {
+                results.isPlaying = !results.isPlaying;
+                const btn = document.getElementById('playPauseBtn');
+                const icon = btn.querySelector('i');
+                
+                if (results.isPlaying) {
+                    icon.classList.remove('fa-play');
+                    icon.classList.add('fa-pause');
+                    this.simulatePlayback();
+                } else {
+                    icon.classList.remove('fa-pause');
+                    icon.classList.add('fa-play');
+                }
+            },
+            
+            simulatePlayback() {
+                if (!results.isPlaying) return;
+                
+                // Simulate time update
+                const currentTimeEl = document.getElementById('currentTime');
+                let seconds = 0;
+                
+                const interval = setInterval(() => {
+                    if (!results.isPlaying) {
+                        clearInterval(interval);
+                        return;
+                    }
+                    
+                    seconds++;
+                    currentTimeEl.textContent = results.formatTime(seconds);
+                    
+                    // Highlight current segment
+                    const segIndex = Math.floor(seconds / 20);
+                    if (segIndex < results.segments.length) {
+                        results.seekTo(segIndex);
+                    }
+                    
+                    if (seconds > 900) { // Stop after 15 min simulation
+                        player.toggle();
+                        clearInterval(interval);
+                    }
+                }, 1000);
+            }
+        };
+
+        // History Management
+        const history = {
+            items: [],
+            
+            load() {
+                // Mock data if empty
+                if (this.items.length === 0) {
+                    this.items = [
+                        { name: 'reunion_equipo_2024.mp3', date: new Date(Date.now() - 86400000), duration: '32:15', model: 'medium' },
+                        { name: 'entrevista_cliente.wav', date: new Date(Date.now() - 172800000), duration: '45:30', model: 'large-v3' },
+                        { name: 'podcast_tecnologia.mp3', date: new Date(Date.now() - 259200000), duration: '1:12:45', model: 'medium' }
+                    ];
+                }
+                this.render();
+            },
+            
+            add(item) {
+                this.items.unshift(item);
+            },
+            
+            render() {
+                const container = document.getElementById('historyList');
+                container.innerHTML = '';
+                
+                this.items.forEach((item, idx) => {
+                    const div = document.createElement('div');
+                    div.className = 'p-4 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors flex items-center justify-between group';
+                    
+                    const dateStr = item.date.toLocaleDateString('es-ES', { 
+                        day: 'numeric', month: 'short', year: 'numeric',
+                        hour: '2-digit', minute: '2-digit'
+                    });
+                    
+                    div.innerHTML = `
+                        <div class="flex items-center gap-4">
+                            <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center text-primary">
+                                <i class="fas fa-file-audio text-xl"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-gray-900 dark:text-white">${item.name}</h4>
+                                <div class="flex items-center gap-3 text-sm text-gray-500 mt-1">
+                                    <span><i class="far fa-calendar mr-1"></i>${dateStr}</span>
+                                    <span><i class="far fa-clock mr-1"></i>${item.duration}</span>
+                                    <span class="px-2 py-0.5 rounded-full bg-gray-200 dark:bg-gray-700 text-xs">${item.model}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <button onclick="history.download(${idx})" class="p-2 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-400" title="Descargar TXT">
+                                <i class="fas fa-file-alt"></i>
+                            </button>
+                            <button onclick="history.downloadSRT(${idx})" class="p-2 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-400" title="Descargar SRT">
+                                <i class="fas fa-closed-captioning"></i>
+                            </button>
+                            <button onclick="history.delete(${idx})" class="p-2 rounded-lg hover:bg-red-100 dark:hover:bg-red-900/30 text-red-500" title="Eliminar">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    `;
+                    
+                    container.appendChild(div);
+                });
+            },
+            
+            download(idx) {
+                toast.show('Descargando TXT...');
+            },
+            
+            downloadSRT(idx) {
+                toast.show('Descargando SRT...');
+            },
+            
+            delete(idx) {
+                if (confirm('¿Eliminar esta transcripción?')) {
+                    this.items.splice(idx, 1);
+                    this.render();
+                    toast.show('Transcripción eliminada');
+                }
+            }
+        };
+
+        // Toast Notifications
+        const toast = {
+            show(message, type = 'success') {
+                const toast = document.getElementById('toast');
+                const icon = document.getElementById('toastIcon');
+                const msg = document.getElementById('toastMessage');
+                
+                msg.textContent = message;
+                
+                if (type === 'error') {
+                    icon.className = 'fas fa-exclamation-circle text-red-500 text-xl';
+                } else {
+                    icon.className = 'fas fa-check-circle text-green-500 text-xl';
+                }
+                
+                toast.classList.remove('translate-y-20', 'opacity-0');
+                
+                setTimeout(() => {
+                    toast.classList.add('translate-y-20', 'opacity-0');
+                }, 3000);
+            }
+        };
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            theme.init();
+            upload.init();
+            
+            // Checkboxes styling
+            document.querySelectorAll('.checkbox-wrapper input').forEach(checkbox => {
+                checkbox.addEventListener('change', function() {
+                    // Visual feedback handled by CSS
+                });
+            });
+            
+            // Update time estimate when model changes
+            document.getElementById('configModel').addEventListener('change', function() {
+                if (upload.file) {
+                    // Trigger re-estimation
+                    const event = { target: { files: [upload.file] } };
+                    upload.handleFile(upload.file);
+                }
+            });
+        });
+    </script>
+</body>
+</html>

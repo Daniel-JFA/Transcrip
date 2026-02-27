@@ -1,0 +1,8 @@
+<section *ngIf="text" class="result-wrapper">
+  <div class="actions">
+    <button type="button" (click)="copyToClipboard()">Copy</button>
+    <button type="button" (click)="download(text, 'transcription.txt')">TXT</button>
+    <button type="button" [disabled]="!srt" (click)="download(srt || '', 'transcription.srt')">SRT</button>
+  </div>
+  <pre>{{ text }}</pre>
+</section>
