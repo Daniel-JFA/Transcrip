@@ -1,4 +1,10 @@
-Grabación estándar 9.mp3
 __pycache__/
 *.pyc
+
+# Archivos multimedia locales (usar Git LFS si se necesitan versionar)
+*.mp3
+*.mp4
+*.wav
+
+# Uploads temporales/generados por backend
 transcript-pro/backend/storage/uploads/
